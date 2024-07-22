@@ -6,12 +6,8 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
-    <script src="assets/events.js?v=20240718001"></script>
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
-    <link rel="manifest" href="assets/favicon/site.webmanifest">
-    <link rel="stylesheet" href="assets/main.css">
+
+
     <style>
     video {
         width: 50vw !important;
@@ -25,42 +21,84 @@
         bottom: 0 !important;
     }
     </style>
+    <script>
+        var step = 1;
+        var is_notified = false;
+        var arbox;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            arbox = document.querySelector('.arbox');
+        });
+
+        AFRAME.registerComponent('image-tracker-1', {
+            init: function () {
+                console.log("image-tracker-1 init");
+                alert("已進入AR模式，請掃描封面辨識點");
+            },
+            tick: function() {
+                if (this.el.object3D.visible == true) {
+                    console.log("image-tracker-1 detected");
+                    // 掃描到辨識點
+                    arbox.style.display = "block";
+                    alert("辨識成功");
+                    step = 2;
+                }
+            }
+        });
+
+        AFRAME.registerComponent('image-tracker-2', {
+            init: function () {
+                console.log("image-tracker-2 init");
+            },
+            tick: function() {
+                if (this.el.object3D.visible == true) {
+                    console.log("image-tracker-2 detected");
+                    if (step != 2 && !is_notified) {
+                        is_notified = true;
+                        alert("請先掃描封面辨識點");
+                    }
+                }
+            }
+        });
+     </script>
 </head>
 <body style='margin : 0px; overflow: hidden;'>
-    <div id="fixed-video-container-1" class="fixed-video-container">
-        <a href="#" class="close-btn">×</a>
-        <video id="fixed-video-1" src="assets/videos/demo-1.mp4" loop="true" muted playsinline crossorigin></video>
-        <p>This is a test information for Demo 1.</p>
-    </div>
-    <div class="ar-container">
+    <div class="arbox"></div>
+    <div class="ar-comtainer">
         <a-scene
             vr-mode-ui="enabled: false;"
             renderer="logarithmicDepthBuffer: true;"
             embedded
             device-orientation-permission-ui="enabled: false"
             arjs="trackingMethod: best; sourceType: webcam;debugUIEnabled: false;">
-            
-            <!-- 第一個圖像跟踪目標，顯示影片 -->
             <a-nft
                 type='nft'
-                url='assets/images/marker01'
+                url='https://yozuwork.github.io/WEBARImageTracking2.0/assets/tracking_target/marker'
                 smooth='true'
                 smoothCount='10'
                 smoothTolerance='0.01'
                 smoothThreshold='5'
                 image-tracker-1>
-                <a-video
-                    src='#demoVideo'
+                <a-entity
+                    gltf-model='https://yozuwork.github.io/WEBARImageTracking2.0/assets/scene.gltf'
                     scale="5 5 5"
-                    position="0 0 0">
-                </a-video>
+                    position="50 150 0">
+                </a-entity>
             </a-nft>
-
-            <!-- 影片資源  ddd-->
-            <a-assets>
-                <video id="demoVideo" src="assets/videos/demo-1.mp4" autoplay loop="true" webkit-playsinline playsinline></video>
-            </a-assets>
-
+            <a-nft
+                type='nft'
+                url='https://yozuwork.github.io/WEBARImageTracking2.0/assets/tracking_target/marker-2'
+                smooth='true'
+                smoothCount='10'
+                smoothTolerance='0.01'
+                smoothThreshold='5'
+                image-tracker-2>
+                <a-entity
+                    gltf-model='https://yozuwork.github.io/WEBARImageTracking2.0/assets/scene.gltf'
+                    scale="5 5 5"
+                    position="50 150 0">
+                </a-entity>
+            </a-nft>
             <a-entity camera></a-entity>
         </a-scene>
     </div>
